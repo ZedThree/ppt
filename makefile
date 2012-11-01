@@ -11,7 +11,7 @@ FC = gfortran
 FFLAGS = #-ffpe-trap=invalid -g -O0
 
 # Files
-OBJECTS = globals.f03 particle.f03 pusher.f03 fields.f03 ppt.f03
+OBJECTS = globals.f03 particle.f03 fields.f03 pusher.f03 ppt.f03
 OBJLIST = $(addprefix $(OBJDIR)/,$(OBJECTS:.f03=.o))
 
 # Executable linking

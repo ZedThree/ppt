@@ -5,7 +5,8 @@ MODULE globals
 
   IMPLICIT none
   
-  !< Particle spatial coordinates
+  ! Particle properties
+  !> Particle spatial coordinates
   REAL, DIMENSION(3) :: position
   !> Particle velocity coordinates
   REAL, DIMENSION(3) :: velocity
@@ -15,6 +16,14 @@ MODULE globals
   INTEGER :: Y_coord = 2
   !> Z coordinate index
   INTEGER :: Z_coord = 3
+  !> Particle mass
+  REAL :: mass = 1.
+  !> Particle charge
+  REAL :: charge = 1.
+
+  !> Time step
+  REAL :: dt = 1.
+  
   
 END MODULE globals
 

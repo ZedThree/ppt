@@ -19,6 +19,11 @@ PROGRAM ppt
 
   IMPLICIT none
 
+  !> Time
+  REAL :: time
+  !> Time step number
+  INTEGER :: step
+
   !> Magnitude of B
   REAL :: b_mag
   !> Direction of B
@@ -28,13 +33,22 @@ PROGRAM ppt
 
   CALL init_particle
 
-  CALL get_B_mag(position, b_mag)
-  CALL get_B_vec(position, b_vec)
-  
-  PRINT*, "position: ", position
-  PRINT*, "velocity: ", velocity
-  PRINT*, "B: ", b_mag*b_vec
-  PRINT*, "v x B: ", cross(velocity, b_mag*b_vec)
+  PRINT*, "Start"
+  PRINT*, "Position: ", position
+  PRINT*, "Velocity: ", velocity
+  PRINT*, "------------------------------------"
+
+  DO step = 0, 20
+     time = step * dt
+     CALL rk4(position, velocity)
+     CALL get_B(position, b_vec)
+     PRINT*, "Time: ", time
+     PRINT*, "Position: ", position
+     PRINT*, "Velocity: ", velocity
+     PRINT*, "v x B: ", cross(velocity, b_vec)
+     PRINT*, "Acceleration: ", acceleration(position, velocity)
+     PRINT*, "------------------------------------"
+  END DO
   
   ! push particle
 
