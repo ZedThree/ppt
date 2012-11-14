@@ -29,26 +29,27 @@ PROGRAM ppt
   REAL :: b_mag
   !> Direction of B
   REAL, DIMENSION(3) :: b_vec
+  !> Kinetic energy of particle
+  REAL :: energy = 0.
 
-  ! read input file
-
-  CALL init_particle
-
-  PRINT*, "Start"
-  PRINT*, "Position: ", position
-  PRINT*, "Velocity: ", velocity
+  PRINT*, "------------------------------------"
+  PRINT*, "Starting Peter's Particle Tracker"
   PRINT*, "------------------------------------"
 
-  DO step = 0, 20
+!  CALL init_particle
+  CALL read_input
+
+  ! Boris needs to move velocity back in time by half a time step
+  CALL boris(position, velocity, -0.5*dt)
+
+  DO step = 0, nsteps
      time = step * dt
-     CALL rk4(position, velocity)
-     CALL get_B(position, b_vec)
-     PRINT*, "Time: ", time
-     PRINT*, "Position: ", position
-     PRINT*, "Velocity: ", velocity
-     PRINT*, "v x B: ", cross(velocity, b_vec)
-     PRINT*, "Acceleration: ", acceleration(position, velocity)
-     PRINT*, "------------------------------------"
+!     CALL rk4(position, velocity)
+     CALL boris(position, velocity, dt)
+!     CALL get_B(position, b_vec)
+     energy = 0.
+     energy = kinetic_energy(velocity)
+     CALL write_output(position, velocity, energy, time)
   END DO
   
   ! push particle

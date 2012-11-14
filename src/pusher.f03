@@ -98,4 +98,56 @@ MODULE pusher
 
     END SUBROUTINE rk4
 
+    !----------------------------------------------------
+    !> Boris integrator.
+    !> See that PIC website for more details.
+    !> Or the Boris paper?
+    !----------------------------------------------------
+    SUBROUTINE boris(position, velocity, dt)
+      
+      !> Initial position, returns as final position
+      REAL, DIMENSION(3), INTENT(INOUT) :: position
+      !> Initial velocity, returns as final velocity
+      REAL, DIMENSION(3), INTENT(INOUT) :: velocity
+      !> Time-step
+      REAL , INTENT(in) :: dt
+      
+      ! dummy variables
+      !> v_minus
+      REAL, DIMENSION(3) :: v_minus
+      !> v_plus
+      REAL, DIMENSION(3) :: v_plus
+      !> v_prime
+      REAL, DIMENSION(3) :: v_prime
+      !> t vector
+      REAL, DIMENSION(3) :: t
+      !> s vector
+      REAL, dimension(3) :: s
+      !> Magnetic field
+      REAL, DIMENSION(3) :: B
+      !> Electric field
+      REAL, DIMENSION(3) :: E
+      !> t magnitude, squared
+      REAL :: t_mag2
+
+      CALL get_B(position, B)
+      CALL get_E(position, E)
+
+      t = (charge/mass)*B*0.5*dt
+      t_mag2 = t(1)*t(1) + t(2)*t(2) + t(3)*t(3)
+
+      s = 2*t/(1+t_mag2)
+
+      v_minus = velocity + (charge/mass)*E*0.5*dt
+      v_prime = v_minus + cross(v_minus, t)
+      v_plus  = v_minus + cross(v_prime, s)
+
+      velocity = v_plus + (charge/mass)*E*0.5*dt
+
+      IF (dt .LT. 0.) RETURN
+
+      position = position + velocity*dt
+
+    END SUBROUTINE boris
+    
 END MODULE pusher
