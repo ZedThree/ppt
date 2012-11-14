@@ -21,8 +21,19 @@ MODULE globals
   !> Particle charge
   REAL :: charge = 1.
 
-  !> Time step
-  REAL :: dt = 1.
+  ! Stepper variables
+  !> Length of time step
+  REAL 	  :: dt = 0.01
+  !> Number of time steps
+  INTEGER :: nsteps = 100
+
+  ! Misc variables
+  !> Input file unit number
+  INTEGER :: input_dat = 10
+  !> STDIN file unit number
+  INTEGER :: stdin = 6
+  !> Output file unit number
+  INTEGER :: output_dat = 20
   
   
 END MODULE globals

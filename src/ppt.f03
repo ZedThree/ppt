@@ -1,9 +1,17 @@
 !----------------------------------------------------
 ! Doxygen front page
 !> \mainpage
-!! Peter's Particle Tracker (PPT)
+!! Peter's Particle Tracker (PPT).
+!! ===============================
+!!
 !! A little program for tracking charged particles in
 !! electromagnetic fields.
+!!
+!! To do:
+!! ------
+!! 
+!! - Write a reader
+!! - Write a writer
 !<
 !----------------------------------------------------
 !> Main program.

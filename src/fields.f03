@@ -23,7 +23,8 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      B = 1
+      B = 1.
+!      B = position(3)
 
     END SUBROUTINE get_B_mag
 
@@ -43,6 +44,7 @@ MODULE fields
       ! At some point, will need to be able to choose between
       ! functions and so on.
       b = (/0., 0., 1./)
+!      b = (/-0.5*position(1), -0.5*position(2), 1.*position(3)/)
       
     END SUBROUTINE get_B_vec
     
@@ -81,7 +83,7 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      E = 0
+      E = 1.
 
     END SUBROUTINE get_E_mag
 
@@ -99,7 +101,7 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      e = (/0., 0., 0./)
+      e = (/1., 0., 0./)
       
     END SUBROUTINE get_E_vec
 
