@@ -12,10 +12,11 @@
 PROGRAM ppt
 
   USE globals
+  USE reader
   USE particle
   USE fields
   USE pusher
-  ! USE writer
+  USE writer
 
   IMPLICIT none
 
