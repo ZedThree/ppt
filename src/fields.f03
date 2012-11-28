@@ -3,6 +3,9 @@
 !----------------------------------------------------
 MODULE fields
 
+  USE dipole
+  USE globals
+
   IMPLICIT none
 
   ! calculate the fields
@@ -23,7 +26,10 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      B = 1.
+      
+      B = B_mag
+
+      ! B = 1.
 !      B = position(3)
 
     END SUBROUTINE get_B_mag
@@ -43,7 +49,10 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      b = (/0., 0., 1./)
+
+      b = b_vec
+
+      ! b = (/0., 0., 1./)
 !      b = (/-0.5*position(1), -0.5*position(2), 1.*position(3)/)
       
     END SUBROUTINE get_B_vec
@@ -62,10 +71,33 @@ MODULE fields
       !> Magnetic field magnitude
       REAL 			      :: B_mag
 
-      CALL get_B_mag(position, B_mag)
-      CALL get_B_vec(position, b_vec)
+      !> Temporary values for the magnetic field
+      REAL, DIMENSION(3) :: b_temp1, b_temp2
+      !> Particle's position relative to dipoles
+      REAL, DIMENSION(3) :: pos_temp1, pos_temp2
+      
+      SELECT CASE(B_type)
+      CASE(1)
+         CALL get_B_mag(position, B_mag)
+         CALL get_B_vec(position, b_vec)
 
-      B = B_mag*b_vec
+         B = B_mag*b_vec
+      CASE(2)
+         ! Get particle's positive relative to each dipole
+         pos_temp1 = position - dipole1%position
+         pos_temp2 = position - dipole2%position
+
+         ! PRINT*, "pos1: ", pos_temp1
+         ! PRINT*, "pos2: ", pos_temp2
+
+         CALL dipole_field(pos_temp1, dipole1, b_temp1)
+         CALL dipole_field(pos_temp2, dipole2, b_temp2)
+
+         B = b_temp1 ! + b_temp2
+         ! PRINT*, "B1: ", b_temp1
+         ! PRINT*, "B2: ", b_temp2
+         
+      END SELECT
       
     END SUBROUTINE get_B
 
@@ -83,7 +115,10 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      E = 1.
+      
+      E = E_mag
+
+      ! E = 1.
 
     END SUBROUTINE get_E_mag
 
@@ -101,7 +136,10 @@ MODULE fields
       ! Nice and hard-coded for now.
       ! At some point, will need to be able to choose between
       ! functions and so on.
-      e = (/1., 0., 0./)
+
+      e = e_vec
+
+      ! e = (/1., 0., 0./)
       
     END SUBROUTINE get_E_vec
 

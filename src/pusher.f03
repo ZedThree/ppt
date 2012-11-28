@@ -37,14 +37,16 @@ MODULE pusher
     !> Calculate the acceleration of a particle at
     !> position
     !----------------------------------------------------
-    FUNCTION acceleration(position, velocity)
+    FUNCTION acceleration(particle)
 
       !> Acceleration due to EM fields
       REAL, DIMENSION(3) :: acceleration
-      !> Position of particle
-      REAL, DIMENSION(3), INTENT(IN) :: position
-      !> Velocity of particle
-      REAL, DIMENSION(3), INTENT(IN) :: velocity
+      !> particle
+      TYPE(particle_obj), INTENT(in) :: particle
+      ! !> Position of particle
+      ! REAL, DIMENSION(3), INTENT(IN) :: position
+      ! !> Velocity of particle
+      ! REAL, DIMENSION(3), INTENT(IN) :: velocity
       !> Lorentz force vector
       REAL, DIMENSION(3) :: force
       !> Magnetic field
@@ -53,62 +55,65 @@ MODULE pusher
       REAL, DIMENSION(3) :: E
 
       !> Get the EM field vectors
-      CALL get_B(position, B)
-      CALL get_E(position, E)
+      CALL get_B(particle%position, B)
+      CALL get_E(particle%position, E)
 
       !> Calculate Lorentz force
-      force = charge*(E + cross(velocity, B))
+      force = particle%charge*(E + cross(particle%velocity, B))
 
-      acceleration = force/mass
+      acceleration = force/particle%mass
       
     END FUNCTION acceleration
     
     !----------------------------------------------------
     !> Runge-Kutta fourth order integrator
     !----------------------------------------------------
-    SUBROUTINE rk4(position, velocity)
+    ! SUBROUTINE rk4(position, velocity)
 
-      !> Initial position, returns as final position
-      REAL, DIMENSION(3), INTENT(INOUT) :: position
-      !> Initial velocity, returns as final velocity
-      REAL, DIMENSION(3), INTENT(INOUT) :: velocity
-      ! dummy variables
-      REAL, DIMENSION(3) :: x1, x2, x3, x4
-      REAL, DIMENSION(3) :: v1, v2, v3, v4
-      REAL, DIMENSION(3) :: a1, a2, a3, a4
+    !   !> Initial position, returns as final position
+    !   REAL, DIMENSION(3), INTENT(INOUT) :: position
+    !   !> Initial velocity, returns as final velocity
+    !   REAL, DIMENSION(3), INTENT(INOUT) :: velocity
+    !   ! dummy variables
+    !   REAL, DIMENSION(3) :: x1, x2, x3, x4
+    !   REAL, DIMENSION(3) :: v1, v2, v3, v4
+    !   REAL, DIMENSION(3) :: a1, a2, a3, a4
 
-      x1 = position
-      v1 = velocity
-      a1 = acceleration(x1, v1)
+    !   x1 = position
+    !   v1 = velocity
+    !   a1 = acceleration(x1, v1)
 
-      x2 = position + 0.5*v1*dt
-      v2 = velocity + 0.5*a1*dt
-      a2 = acceleration(x2, v2)
+    !   x2 = position + 0.5*v1*dt
+    !   v2 = velocity + 0.5*a1*dt
+    !   a2 = acceleration(x2, v2)
 
-      x3 = position + 0.5*v2*dt
-      v3 = velocity + 0.5*a2*dt
-      a3 = acceleration(x3, v3)      
+    !   x3 = position + 0.5*v2*dt
+    !   v3 = velocity + 0.5*a2*dt
+    !   a3 = acceleration(x3, v3)      
       
-      x4 = position + v3*dt
-      v4 = velocity + a3*dt
-      a4 = acceleration(x3, v3)
+    !   x4 = position + v3*dt
+    !   v4 = velocity + a3*dt
+    !   a4 = acceleration(x3, v3)
 
-      position = position + (v1 + 2*v2 + 2*v3 + v4)*(dt/6.)
-      velocity = velocity + (a1 + 2*a2 + 2*a3 + a4)*(dt/6.)
+    !   position = position + (v1 + 2*v2 + 2*v3 + v4)*(dt/6.)
+    !   velocity = velocity + (a1 + 2*a2 + 2*a3 + a4)*(dt/6.)
 
-    END SUBROUTINE rk4
+    ! END SUBROUTINE rk4
 
     !----------------------------------------------------
     !> Boris integrator.
     !> See that PIC website for more details.
     !> Or the Boris paper?
     !----------------------------------------------------
-    SUBROUTINE boris(position, velocity, dt)
+    SUBROUTINE boris(particle, dt)
       
-      !> Initial position, returns as final position
-      REAL, DIMENSION(3), INTENT(INOUT) :: position
-      !> Initial velocity, returns as final velocity
-      REAL, DIMENSION(3), INTENT(INOUT) :: velocity
+      !> The particle
+      TYPE(particle_obj), INTENT(inout) :: particle
+      
+      ! !> Initial position, returns as final position
+      ! REAL, DIMENSION(3), INTENT(INOUT) :: position
+      ! !> Initial velocity, returns as final velocity
+      ! REAL, DIMENSION(3), INTENT(INOUT) :: velocity
       !> Time-step
       REAL , INTENT(in) :: dt
       
@@ -129,24 +134,28 @@ MODULE pusher
       REAL, DIMENSION(3) :: E
       !> t magnitude, squared
       REAL :: t_mag2
+      !> Particle charge/mass ratio
+      REAL :: q_over_m
 
-      CALL get_B(position, B)
-      CALL get_E(position, E)
+      q_over_m = particle%charge/particle%mass
 
-      t = (charge/mass)*B*0.5*dt
+      CALL get_B(particle%position, B)
+      CALL get_E(particle%position, E)
+
+      t = q_over_m*B*0.5*dt
       t_mag2 = t(1)*t(1) + t(2)*t(2) + t(3)*t(3)
 
       s = 2*t/(1+t_mag2)
 
-      v_minus = velocity + (charge/mass)*E*0.5*dt
+      v_minus = particle%velocity + q_over_m*E*0.5*dt
       v_prime = v_minus + cross(v_minus, t)
       v_plus  = v_minus + cross(v_prime, s)
 
-      velocity = v_plus + (charge/mass)*E*0.5*dt
+      particle%velocity = v_plus + q_over_m*E*0.5*dt
 
       IF (dt .LT. 0.) RETURN
 
-      position = position + velocity*dt
+      particle%position = particle%position + particle%velocity*dt
 
     END SUBROUTINE boris
     
